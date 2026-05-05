@@ -1,10 +1,11 @@
-**What this does:**
+## what
 
-**Why:**
+describe what your PR does.
 
-**Tested on:**
-- [ ] compiles
-- [ ] loads on real kernel
-- [ ] doesn't break existing tests
+## testing
+- [ ] it compiles
+- [ ] tests pass
 
-**Notes:**
+## notes
+
+anything else?

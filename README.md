@@ -1,90 +1,50 @@
 # javelin-ebpf-agent
 
-we built this because erick wants to play Battlefield on his fucking ASUS ROG Ally.
+erick wants to play battlefield on his asus ROG ally. this is the eBPF
+agent that watches what the game process is doing.
 
-That's it. That's the whole reason.
+## what this is
 
-## why dump everything now
+an experimental linux telemetry agent for games that use kernel-level
+anti-cheat. the eBPF agent monitors kernel events via LSM hooks and
+tracepoints — no kernel modules, no rootkit behavior.
 
-we have been working on this locally for about two months. kept it
-offline while we fought the eBPF verifier. today nick decided to just
-put it all up at once because he was tired of sitting on it.
+it tells you when:
+- memory changes from writable to executable (self-modifying code)
+- a debugger attaches via ptrace
+- someone loads a kernel module
+- someone opens /proc/kallsyms
+- another eBPF program loads while the game is running
 
-he used some AI tools to help organize the upload because the local
-files were a mess and hes been juggling too many projects. it probably
-fucked some stuff up. if something looks wrong, thats why. the code
-itself is real, he just got lazy with the repo organization.
+it doesnt block anything. just reports. the verifier makes sure it cant
+crash your kernel.
 
-## What this actually is
+**whats actually novel here:**
+- eBPF LSM hooks for anti-cheat telemetry (no publisher does this)
+- CO-RE compatible eBPF (works across kernel versions without recompilation)
+- memory integrity baseline: hashes .text regions on W->X transitions
+- timer anomaly detection via `clock_gettime` syscall tracing
+- privilege-dropping loader (loads eBPF, then drops to user)
 
-It's an eBPF program that sits in the Linux kernel and watches what
-your game process is doing. It tells you when:
+**honest limitations:**
+- this is kernel telemetry, not a finished anti-cheat
+- no backend exists yet. reports go nowhere.
+- no publisher partner. this is a proof of concept.
+- if someone has root before this loads, they can bypass it
+- the kallsyms detector is jank. it works but its ugly.
 
-- Something changes memory from writable to executable (self-modifying code)
-- A debugger attaches via ptrace
-- Someone loads a kernel module
-- Someone opens /proc/kallsyms (where kernel exploit code lives)
-- Another eBPF program loads while your game is running
+## why eBPF and not a kernel module
 
-It doesn't block anything. It just reports. The verifier makes sure
-it can't crash your kernel.
+kernel modules crash when you update your kernel. they need rebuilding
+for every version. theyre proprietary black boxes running in ring 0.
 
-## Why eBPF and not a kernel module
+eBPF is different. the kernel verifies the code before loading. if theres
+a bug, the kernel refuses to load it. its auditable — you can read all
+the code and know exactly what it does.
 
-Because kernel modules are bullshit.
+BTF/CO-RE means it works across kernel versions without rebuilding.
 
-They crash when you update your kernel. They need to be rebuilt for
-every kernel version. They're proprietary black boxes that run in ring
-0 with zero oversight. When EAC or BattlEye loads a kernel module,
-you have no idea what it's doing.
-
-eBPF is different. The kernel verifies the code before loading it.
-If there's a bug, the kernel refuses to load it. It's auditable —
-you can read all 154 lines and know exactly what it does.
-
-And BTF/CO-RE means it works across kernel versions without rebuilding.
-
-## What this is NOT
-
-- This is NOT a finished anti-cheat
-- This does NOT block cheaters
-- This does NOT have a backend to talk to
-- This does NOT have a publisher partner
-- This does NOT detect everything
-
-This is a piece of kernel telemetry. It reports events. What happens
-with those events is someone else's problem.
-
-## The honest security situation
-
-If someone has root on your machine, they can unload this eBPF program
-or patch it. We detect that and report it, but we can't stop it.
-
-If someone loads a rootkit BEFORE this agent starts, we can't detect
-that from inside the kernel. We check /proc/modules and Secure Boot
-status, but a determined attacker can hide their module.
-
-We don't have signing. We don't have a backend. We don't have EA's
-certificate. This is infrastructure, not a product.
-
-## Who built this
-
-Nick, Erick, Dyllan. Three friends who met in real life. Nick
-spearheaded this project and wrote most of the eBPF code.
-
-Erick has an ASUS ROG Ally and an older ASUS laptop. He's mad he can't
-play Battlefield. He lives in California.
-
-Nick has a 2024 ASUS ROG Zephyrus G16 GU605MY. He debugged verifier
-rejections for three days straight. He also lives in California,
-California.
-
-Dyllan has a 2026 ASUS TUF F16 with an RTX 5060. He moved to
-Montana so we collaborate over Discord now.
-
-We have day jobs. This is a nights-and-weekends project.
-
-## Build it
+## build it
 
 ```bash
 make vmlinux
@@ -92,21 +52,43 @@ make
 sudo ./build/javelin-loader build/javelin_monitor.bpf.o $(pidof your_game)
 ```
 
-Needs: clang, libbpf-dev, bpftool, linux-headers. Kernel 5.15+ with BTF.
+needs: clang, libbpf-dev, bpftool, linux-headers. kernel 5.15+ with BTF.
 
-Tested on Bazzite 43, SteamOS 3.5, Fedora 43.
+**distro quirks:**
+- ubuntu 22.04 ships libbpf 0.5 which is too old. use the ppa or build from source.
+- fedora 43 works out of the box. fedora 42 needed a kernel arg for BPF_LSM.
+- steamos 3.5 has BTF but bpftool is missing. install it via pacman.
+- bazzite 43 works. bazzite 41 needed `rpm-ostree karg` for BPF_LSM.
 
-## Performance
+tested on bazzite 43, steamos 3.5, fedora 43.
 
-Run `tests/memscan_benchmark.c` yourself. Numbers vary by hardware.
+## performance
 
-On nicks zephyrus G16 (the machine this was tested on):
-- Memory scan: ~4,800–10,600 MB/s depending on block size
-- Syscall latency: ~0.3–0.5 ms
+run `tests/memscan_benchmark.c` yourself. numbers vary by hardware.
+
+on nicks zephyrus G16 (the machine this was tested on):
+- memory scan: ~4,800–10,600 MB/s depending on block size
+- syscall latency: ~0.3–0.5 ms
 - eBPF overhead: <1 µs per event
 
-## License
+## who built this
+
+nick, erick, dyllan. three friends who met in real life.
+
+nick wrote most of the eBPF code and debugged verifier rejections for
+three days straight. he has a 2024 asus ROG zephyrus G16 GU605MY and
+lives in california.
+
+erick has an asus ROG ally and wants to play battlefield. he also lives
+in california.
+
+dyllan has a 2026 asus tuf F16 with an RTX 5060. he moved to montana so
+we collaborate over discord now.
+
+this is a nights-and-weekends project. we have day jobs.
+
+## license
 
 GPL-2.0.
 
-Contact: solarsystemsdsp@protonmail.com
+contact: solarsystemsdsp@protonmail.com

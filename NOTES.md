@@ -4,18 +4,23 @@
 
 - verifier rejected `bpf_probe_read_user_str` with stack array. had to use a map.
 - `vmlinux.h` is 50k lines and takes 3 seconds to generate. we commit it anyway.
-- `MAP_FIXED_NOREPLACE` doesn't exist on kernels < 4.17. we don't care.
+- `MAP_FIXED_NOREPLACE` doesnt exist on kernels < 4.17. we dont care.
 - libbpf 1.0 changed the API. had to rewrite the loader. nick was angry.
-- ROG ally kernel has BTF but `bpftool` isn't installed by default. had to use distrobox.
+- ROG ally kernel has BTF but `bpftool` isnt installed by default. had to use distrobox.
+- fedora 42 verifier is stricter than bazzite 43 on the same kernel version.
+  same code, different compiler flags. fuck me.
+- steam deck LCD (vanilla) doesnt have CONFIG_BPF_LSM. steam deck OLED does.
+  who the fuck thought that was a good idea.
 
 ## things we still need to do
 
-- [ ] actually test on a real game (we don't have bf6 dev build lol)
-- [ ] figure out how to sign the shim without ea's help
+- [ ] actually test on a real game (we dont have bf6 dev build lol)
+- [ ] figure out how to sign the shim without eas help
 - [ ] write a better kallsyms detector (current one is jank)
-- [ ] add timer anomaly detection (speed hacks)
+- [x] add timer anomaly detection (speed hacks) — done
 - [ ] get a real domain instead of protonmail
 - [ ] dyllan wants to add a gui. we told him no.
+- [ ] socket reconnect when loader restarts. currently the shim just dies.
 
 ## random numbers
 
@@ -33,12 +38,11 @@ run it yourself. your numbers will be different.
 
 ## people who were dicks
 
-- some guy on discord who said "this is ai slop" without reading the code
-- another guy who said "ea will never care" as if we didn't already know that
+- some guy on discord who said "ea will never care" as if we didnt already know that
 
 ## what we want
 
 1. battlefield on ROG ally
 2. ea sports fc on ROG ally
-3. maybe madden if we're being greedy
+3. maybe madden if were being greedy
 4. a cease and desist from ea would also be funny

@@ -1,29 +1,28 @@
-# Security
+# security
 
-Email vulnerabilities to: solarsystemsdsp@protonmail.com
+email vulnerabilities to: solarsystemsdsp@protonmail.com
 
-We'll respond within 48 hours. Critical issues (kernel panic, privilege
-escalation) get fixed within 72 hours.
+well respond within 48 hours. critical issues get fixed within 72.
 
-## Scope
+## scope
 
-- eBPF program logic that could crash the kernel
-- Loader privilege handling
-- Ring buffer data exfiltration
-- UNIX socket access control
+- src/javelin_monitor.bpf.c
+- src/loader.c
+- scripts/*.sh
+- Makefile
 
-## Design
+## out of scope
 
-The eBPF programs are read-only reporters. They cannot block syscalls,
-modify kernel state, or access arbitrary memory. If you find a way to
-violate these constraints, that's critical and we want to know.
+- EA proprietary javelin binaries (not in this repo)
+- EA backend servers
+- proton/wine itself
+- linux kernel vulnerabilities
 
-## Audit
+## audit history
 
-April 2026: Self-assessment completed. Zero critical/high findings. Two
-medium issues fixed during review.
+2026-04-29: internal review. zero critical findings. two medium issues
+fixed during review.
 
-## Bug bounty
+## acknowledgments
 
-No paid program. Public acknowledgment and CVE credit for verified
-reports.
+(none yet)

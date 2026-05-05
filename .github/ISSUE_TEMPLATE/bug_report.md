@@ -1,18 +1,23 @@
 ---
-name: Bug report
-about: Something is broken
-title: ''
+name: Bug Report
+about: something broke
 labels: bug
-assignees: ''
-
 ---
 
-**What happened:**
+## what happened
 
-**What you expected:**
+## your setup
+- distro:
+- kernel: (`uname -r`)
+- proton version:
+- game:
 
-**Kernel version:**
+## how to reproduce
+1.
+2.
+3.
 
-**Distro:**
-
-**How to reproduce:**
+## logs
+```
+paste output here
+```

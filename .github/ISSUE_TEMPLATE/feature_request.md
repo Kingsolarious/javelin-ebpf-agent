@@ -1,14 +1,11 @@
 ---
-name: Feature request
-about: I want this thing to do something else
-title: ''
+name: Feature Request
+about: suggest something
 labels: enhancement
-assignees: ''
-
 ---
 
-**What do you want:**
+## what do you want
 
-**Why:**
+## why
 
-**Have you tested this on real hardware:**
+## how should it work

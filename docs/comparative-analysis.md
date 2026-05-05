@@ -1,54 +1,72 @@
-# Javelin vs Existing Linux Anti-Cheat
+# javelin vs other anti-cheat stuff
 
-## Correction
+## correction
 
-Earlier versions of this doc incorrectly stated that EAC and BattlEye
-Linux use kernel modules. They do not. They are userspace-based. That
-was our mistake — we confused the Windows kernel-driver architecture
-with the Linux port.
+earlier versions said EAC and battleye use kernel modules. they dont.
+theyre userspace-based on linux.
 
-This doc has been corrected.
+we also incorrectly implied that battlefield uses EAC or battleye. it
+doesnt. EA uses their own proprietary kernel-level anti-cheat called
+**EA Javelin Anticheat** (unrelated to this project). fucked that up.
 
-## Architecture
+## what actually blocks battlefield on linux
 
-| | EAC Linux | BattlEye Linux | Javelin |
-|---|---|---|---|
-| Kernel interface | Userspace + some kernel access | Userspace + some kernel access | eBPF LSM hooks |
-| Auditable | No | No | Yes (open source) |
-| Community trust | Low | Low | Higher (auditable) |
-| Steam Deck | Whitelisted titles | Whitelisted titles | Universal (if adopted) |
+- **EA Javelin Anticheat**: kernel-mode on windows. proprietary. no linux
+  support. used in battlefield 2042, battlefield V, EA FC, and others.
+- **EAC linux**: userspace. closed source. some titles have proton support
+  enabled (e.g. apex legends), but battlefield is not one of them because
+  battlefield doesnt use EAC.
+- **battleye linux**: userspace. closed source. some titles work on linux.
+  battlefield doesnt use battleye either.
 
-## User Experience
+**the actual problem**: battlefield uses EA's own anti-cheat. there is no
+linux build of EA Javelin Anticheat and EA has not enabled proton support.
+a job posting from march 2026 mentions exploring linux/proton support but
+nothing is shipping yet.
 
-| | EAC / BattlEye | Javelin |
+## architecture comparison
+
+| | windows | linux |
 |---|---|---|
-| First launch | Game-bundled installer | Package manager or systemd |
-| Kernel updates | May break | BTF/CO-RE portable |
-| Uninstall | May leave residue | Package remove |
+| EA Javelin Anticheat | kernel driver | does not exist |
+| EAC | kernel driver | userspace |
+| battleye | kernel driver | userspace |
+| **javelin (this project)** | n/a | eBPF LSM hooks |
 
-## What we actually do differently
+on linux, EAC and battleye run as userspace processes with normal user
+privileges. they do not load kernel modules on linux. our project uses
+eBPF LSM hooks, which do require elevated privileges to load.
 
-EAC and BattlEye Linux are closed-source userspace anti-cheat solutions.
-They work fine for whitelisted titles. We are not trying to replace them.
+## naming clarification
 
-Javelin is an open-source eBPF telemetry agent. It does not block
-cheats. It reports security events (memory changes, debuggers, module
-loads) to a backend that decides what to do with them.
+**this project is not affiliated with EA Javelin Anticheat.** we named it
+before we knew EA trademarked the same name. were not trying to replace
+EA's windows kernel driver. were just exploring whether an open-source
+eBPF telemetry agent could work for linux gamers since EA offers nothing.
 
-Whether this is better or worse than EAC/BattlEye is not the point. The
-point is: no publisher currently uses eBPF for anti-cheat telemetry, and
-we think it's worth exploring.
+## what we actually do differently
 
-## Honest limitations
+EAC, battleye, and EA Javelin are closed-source publisher-controlled
+solutions. we are not trying to replace them.
 
-- No publisher partner yet
-- No backend integration yet
-- No signing infrastructure yet
-- Pre-boot compromise detection requires Secure Boot (not enforced on
-  most Linux gaming distros)
+javelin (this project) is an open-source eBPF telemetry agent. it reports
+security events. it does not block cheats. a backend decides what to do
+with the reports.
 
-## Bottom line
+whether this is better or worse isnt the point. no publisher uses eBPF
+for anti-cheat telemetry and we wanted to see if it could work.
 
-We built this because we want Battlefield on Steam Deck. EAC and
-BattlEye don't support it. We're exploring whether eBPF telemetry could
-fill that gap. That's it.
+## honest limitations
+
+- no publisher partner
+- no backend integration
+- no signing infrastructure
+- pre-boot compromise detection needs secure boot
+- a root-level attacker can unload the ebpf programs
+- we are not EA and cannot make battlefield run on linux by ourselves
+
+## bottom line
+
+we built this because erick wants battlefield on his ROG ally. EA doesnt
+support linux. were exploring whether eBPF telemetry could fill that gap
+but without EA's cooperation no third-party tool can fully solve this.
