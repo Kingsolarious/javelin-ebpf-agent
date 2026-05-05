@@ -1,0 +1,16 @@
+[Unit]
+Description=Javelin eBPF Anti-Cheat Kernel Agent
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/javelin-loader /usr/local/lib/javelin/javelin_monitor.bpf.o
+Restart=on-failure
+RestartSec=5
+User=root
+# Drop privileges after loading eBPF (loader handles this internally)
+# StandardOutput=journal
+# StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
