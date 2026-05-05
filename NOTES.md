@@ -1,48 +1,23 @@
-# random notes
+# Notes
 
-## shit that broke
+## Known Issues
 
-- verifier rejected `bpf_probe_read_user_str` with stack array. had to use a map.
-- `vmlinux.h` is 50k lines and takes 3 seconds to generate. we commit it anyway.
-- `MAP_FIXED_NOREPLACE` doesnt exist on kernels < 4.17. we dont care.
-- libbpf 1.0 changed the API. had to rewrite the loader. nick was angry.
-- ROG ally kernel has BTF but `bpftool` isnt installed by default. had to use distrobox.
-- fedora 42 verifier is stricter than bazzite 43 on the same kernel version.
-  same code, different compiler flags. fuck me.
-- steam deck LCD (vanilla) doesnt have CONFIG_BPF_LSM. steam deck OLED does.
-  who the fuck thought that was a good idea.
+- Verifier rejects `bpf_probe_read_user_str` with stack arrays on some kernels. Character-by-character unrolling required.
+- `vmlinux.h` generation requires bpftool and `/sys/kernel/btf/vmlinux`.
+- `MAP_FIXED_NOREPLACE` unavailable on kernels < 4.17. Falls back to `MAP_FIXED`.
+- libbpf 1.0+ API changes require loader updates on older distributions.
+- Steam Deck LCD lacks `CONFIG_BPF_LSM`. Steam Deck OLED includes it.
+- Fedora 42 verifier stricter than Bazzite 43 on identical kernel versions.
 
-## things we still need to do
+## TODO
 
-- [ ] actually test on a real game (we dont have bf6 dev build lol)
-- [ ] figure out how to sign the shim without eas help
-- [ ] write a better kallsyms detector (current one is jank)
-- [x] add timer anomaly detection (speed hacks) — done
-- [ ] get a real domain instead of protonmail
-- [ ] dyllan wants to add a gui. we told him no.
-- [ ] socket reconnect when loader restarts. currently the shim just dies.
+- [ ] Test with real game process
+- [ ] Shim signing strategy
+- [ ] Improved kallsyms detector
+- [ ] Domain migration from protonmail
 
-## random numbers
+## Benchmarks
 
-bench on nicks zephyrus G16 (2026-04-28):
-self-read 64mb: 4833 mb/s
-mprotect 4mb: 0.44 us
-
-run it yourself. your numbers will be different.
-
-## people who helped
-
-- some guy on r/ebpf pointed out we forgot `bpf_object__close` on error path
-- stackoverflow user "kalevk" for the process_vm_readv chunking code
-- the cilium ebpf docs, genuinely the best resource
-
-## people who were dicks
-
-- some guy on discord who said "ea will never care" as if we didnt already know that
-
-## what we want
-
-1. battlefield on ROG ally
-2. ea sports fc on ROG ally
-3. maybe madden if were being greedy
-4. a cease and desist from ea would also be funny
+2026-04-28 — ASUS ROG Zephyrus G16:
+- Self-read 64 MB: 4,833 MB/s
+- mprotect toggle 4 MB: 0.44 µs

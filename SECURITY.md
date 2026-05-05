@@ -1,28 +1,19 @@
-# security
+# Security
 
-email vulnerabilities to: solarsystemsdsp@protonmail.com
+Report vulnerabilities to: solarsystemsdsp@protonmail.com
 
-well respond within 48 hours. critical issues get fixed within 72.
+## Scope
 
-## scope
+- `src/javelin_monitor.bpf.c`
+- `src/loader.c`
+- `scripts/*.sh`
 
-- src/javelin_monitor.bpf.c
-- src/loader.c
-- scripts/*.sh
-- Makefile
+## Out of Scope
 
-## out of scope
+- EA proprietary binaries
+- Proton/Wine
+- Linux kernel vulnerabilities
 
-- EA proprietary javelin binaries (not in this repo)
-- EA backend servers
-- proton/wine itself
-- linux kernel vulnerabilities
+## Audit History
 
-## audit history
-
-2026-04-29: internal review. zero critical findings. two medium issues
-fixed during review.
-
-## acknowledgments
-
-(none yet)
+- 2026-04-29: Internal review. Zero critical findings.

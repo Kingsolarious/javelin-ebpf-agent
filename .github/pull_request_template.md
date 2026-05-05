@@ -1,11 +1,9 @@
-## what
+## Summary
 
-describe what your PR does.
+## Changes
 
-## testing
-- [ ] it compiles
-- [ ] tests pass
+## Testing
+- [ ] Compiles without warnings
+- [ ] Tests pass
 
-## notes
-
-anything else?
+## Notes

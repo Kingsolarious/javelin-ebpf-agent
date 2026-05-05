@@ -1,23 +1,20 @@
 ---
 name: Bug Report
-about: something broke
 labels: bug
 ---
 
-## what happened
+## Description
 
-## your setup
-- distro:
-- kernel: (`uname -r`)
-- proton version:
-- game:
+## Environment
+- Distribution:
+- Kernel: (`uname -r`)
 
-## how to reproduce
+## Reproduction Steps
+
 1.
 2.
 3.
 
-## logs
+## Logs
 ```
-paste output here
 ```
